@@ -420,7 +420,7 @@ void GPS_NewData() {
 										nav_loopTimer = millis();
 										// prevent runup from bad GPS
 										dTnav = min(dTnav, 1.0);
-										debug[3] = dTnav*1000;
+										//debug[3] = dTnav*1000;
 
 										//calculate distance and bearings for gui and other stuff continously - From home to copter
 										uint32_t dist;
@@ -738,7 +738,7 @@ static void GPS_calc_velocity(){
 		actual_speed[_X] = (float)(GPS_coord[LON] - last[LON]) *  GPS_scaleLonDown * tmp;
 		actual_speed[_Y] = (float)(GPS_coord[LAT]  - last[LAT])  * tmp;
 
-		debug[2] = tmp;
+		//debug[2] = tmp;
 
 #if !defined(GPS_LEAD_FILTER)
 #if defined(MEDFILTER)
@@ -861,7 +861,7 @@ static void GPS_calc_poshold() {
 		nav[axis]  = constrain(nav[axis], -NAV_BANK_MAX, NAV_BANK_MAX);
 		navPID[axis].integrator = poshold_ratePID[axis].integrator;
 
-		debug[axis] = actual_speed[axis];
+		//debug[axis] = actual_speed[axis];
 	}
 
 
