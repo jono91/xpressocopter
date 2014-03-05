@@ -664,7 +664,10 @@ int main (void)
 				case 4:
 				  taskOrder++;
 				  #if SONAR
-					Sonar_update();//debug[2] = sonarAlt;
+					#ifndef MAXSONAR_PWM
+					Sonar_update();
+					#endif
+					debug[2] = sonarAlt;
 				  #endif
 				  #ifdef LANDING_LIGHTS_DDR
 					auto_switch_landing_lights();
@@ -731,7 +734,6 @@ int main (void)
 		    //debug[3] = GPS_angle[PITCH];
 		  #endif
 
-		    debug[3] = sonarAlt;
 
 
 

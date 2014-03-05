@@ -48,9 +48,11 @@ void configureReceiver(void)
 	GPIOSetPinInterrupt( RX5_CH, RX5_PORT, RX5_BIT, edgeTrig, bothEdges);
 	GPIOPinIntEnable( RX5_CH, bothEdges );
 
+#ifdef MAXSONAR_PWM
 	GPIOSetDir( SONARPWM_PORT, SONARPWM_BIT, 0);
 	GPIOSetPinInterrupt( SONARPWM_CH, SONARPWM_PORT, SONARPWM_BIT, edgeTrig, bothEdges);
 	GPIOPinIntEnable( SONARPWM_CH, bothEdges );
+#endif
 }
 
 /*****************************************************************************
@@ -357,7 +359,7 @@ void PIN_INT5_IRQHandler(void)
 *****************************************************************************/
 void PIN_INT6_IRQHandler(void)
 {
-
+#ifdef MAXSONAR_PWM
 	uint16_t cTime,dTime;
 
 	  if ( LPC_GPIO_PIN_INT->IST & (0x1<<6) )
@@ -386,6 +388,30 @@ void PIN_INT6_IRQHandler(void)
 		}
 	  }
 	  return;
+#else
+	  if ( LPC_GPIO_PIN_INT->IST & (0x1<<6) )
+	    {
+	  	if ( LPC_GPIO_PIN_INT->ISEL & (0x1<<6) )
+	  	{
+
+	  	}
+	  	else
+	  	{
+	  	  if ( ( LPC_GPIO_PIN_INT->RISE & (0x1<<6) ) && ( LPC_GPIO_PIN_INT->IENR & (0x1<<6) ) )
+	  	  {
+
+	  		LPC_GPIO_PIN_INT->RISE = 0x1<<6;
+	  	  }
+	  	  if ( ( LPC_GPIO_PIN_INT->FALL & (0x1<<6) ) && ( LPC_GPIO_PIN_INT->IENF & (0x1<<6) ) )
+	  	  {
+
+	  		LPC_GPIO_PIN_INT->FALL = 0x1<<6;
+	  	  }
+	  	  LPC_GPIO_PIN_INT->IST = 0x1<<6;
+	  	}
+	    }
+	    return;
+#endif
 }
 
 /*****************************************************************************

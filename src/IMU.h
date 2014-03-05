@@ -43,7 +43,6 @@ void getEstimatedAttitude();
 void MayhonyAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
 void MayhonyAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
 float invSqrt(float x);
-static void getAttitude(void);
 uint8_t getEstimatedAltitude();
 
 

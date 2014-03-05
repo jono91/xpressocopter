@@ -14,6 +14,14 @@
 #include "LPC13Uxx.h"
 #include "math.h"
 
+static bool check_missed_wp();
+static void GPS_calc_velocity();
+static void GPS_calc_location_error( int32_t* target_lat, int32_t* target_lng, int32_t* gps_lat, int32_t* gps_lng );
+static void GPS_calc_poshold();
+static void GPS_calc_nav_rate(uint16_t max_speed);
+static void GPS_update_crosstrack(void);
+static uint16_t GPS_calc_desired_speed(uint16_t max_speed, bool _slow);
+
 //#define MEDFILTER 1
 
 #if GPS

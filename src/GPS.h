@@ -46,15 +46,8 @@ void GPS_reset_nav();
 void GPS_set_pids();
 void GPS_calc_longitude_scaling(int32_t lat);
 void GPS_set_next_wp(int32_t* lat, int32_t* lon);
-static bool check_missed_wp();
 void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_t* lon2,uint32_t* dist, int32_t* bearing);
-static void GPS_calc_velocity();
 int16_t medianFilter(int16_t data[]);
-static void GPS_calc_location_error( int32_t* target_lat, int32_t* target_lng, int32_t* gps_lat, int32_t* gps_lng );
-static void GPS_calc_poshold();
-static void GPS_calc_nav_rate(uint16_t max_speed);
-static void GPS_update_crosstrack(void);
-static uint16_t GPS_calc_desired_speed(uint16_t max_speed, bool _slow);
 int32_t wrap_18000(int32_t ang);
 int32_t wrap_36000(int32_t ang);
 #endif /* GPS_H_ */

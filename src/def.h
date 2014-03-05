@@ -227,7 +227,7 @@ struct flags_struct {
   #define GPS 0
 #endif
 
-#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(TINY_GPS_SONAR) || defined(MAXSONAR)
+#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(TINY_GPS_SONAR) || defined(MAXSONAR) || defined(MAXSONAR_PWM)
   #define SONAR 1
 #else
   #define SONAR 0

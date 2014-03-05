@@ -12,6 +12,8 @@
 #include "serial.h"
 #include "gpio.h"
 
+static void getAttitude(void);
+
 //#undef MAG
 
 extern struct flags_struct f;
