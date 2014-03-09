@@ -11,8 +11,13 @@
 #include "math.h"
 #include "serial.h"
 #include "gpio.h"
+#include "medianFilter.h"
 
 static void getAttitude(void);
+
+#ifdef SONAR
+extern filterHistory_t SonarFilter;
+#endif
 
 //#undef MAG
 
@@ -74,6 +79,7 @@ extern int32_t  AltHold;
 extern int16_t  errorAltitudeI;
 extern int16_t  BaroPID;
 extern int16_t  vario;              // variometer in cm/s
+extern int16_t  sonarAlt;
 
 #if BARO
   extern int32_t baroPressure;
@@ -748,6 +754,10 @@ uint8_t getEstimatedAltitude(){
 
   EstAlt = (EstAlt * 6 + BaroAlt * 2) >> 3; // additional LPF to reduce baro noise (faster by 30 µs)
 
+#ifdef SONAR
+  //filter sonar output and compensate for tilt
+  debug[3] = applyMedFilter(&SonarFilter,sonarAlt) * halfvz * 2;
+#endif
 
   #if (defined(VARIOMETER) && (VARIOMETER != 2)) || !defined(SUPPRESS_BARO_ALTHOLD)
 	//P

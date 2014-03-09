@@ -23,6 +23,8 @@
 //#define PIDcontroller 1 //original multiwii implementation
 #define PIDcontroller 2 //modified based on alexK's implementation
 
+/******************median filter altitude********************************************************/
+#define MEDFILTER
 
 
 /*************************************************************************************************/

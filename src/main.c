@@ -29,6 +29,9 @@
 #ifdef GPS
 	#include "GPS.h"
 #endif
+#ifdef MEDFILTER
+#include "medianFilter.h"
+#endif
 
 #ifdef MAYHONY
 volatile int16_t gyroAHRS[3];
@@ -67,6 +70,12 @@ volatile int16_t  vario = 0;              // variometer in cm/s
 
 volatile int16_t  debug[4];
 volatile int16_t  sonarAlt; //to think about the unit
+
+#ifdef MEDFILTER
+#ifdef SONAR
+volatile filterHistory_t SonarFilter;
+#endif
+#endif
 
 volatile struct flags_struct f;
 
@@ -293,6 +302,13 @@ void setup() {
     led_flasher_set_sequence(LED_FLASHER_SEQUENCE);
   #endif
   f.SMALL_ANGLES_25=1; // important for gyro only conf
+
+  //initialise median filter structures
+#ifdef MEDFILTER
+#ifdef SONAR
+  initMedianFilter(&SonarFilter, 5);
+#endif
+#endif
 
   initWatchDog();
 }

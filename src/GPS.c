@@ -727,11 +727,6 @@ static void GPS_calc_velocity(){
 	static int32_t last[2] = {0,0};
 	static uint8_t init = 0;
 
-#ifdef MEDFILTER
-	static int16_t speedTabX[3] = {0,0,0};
-	static int16_t speedTabY[3] = {0,0,0};
-	static uint8_t Index = 0;
-#endif
 
 	if (init) {
 		float tmp = 1.0/dTnav;
@@ -741,24 +736,13 @@ static void GPS_calc_velocity(){
 		//debug[2] = tmp;
 
 #if !defined(GPS_LEAD_FILTER)
-#if defined(MEDFILTER)
-		speedTabX[Index] = actual_speed[_X];
-		speedTabY[Index] = actual_speed[_Y];
-		Index++;
-		if(Index>2)
-			Index =0;
 
-		actual_speed[_X] = medianFilter(speedTabX);
-		actual_speed[_Y] = medianFilter(speedTabY);
-
-
-#else
 		actual_speed[_X] = (actual_speed[_X] + speed_old[_X]) / 2;
 		actual_speed[_Y] = (actual_speed[_Y] + speed_old[_Y]) / 2;
 
 		speed_old[_X] = actual_speed[_X];
 		speed_old[_Y] = actual_speed[_Y];
-#endif
+
 
 #endif
 	}
@@ -776,40 +760,7 @@ static void GPS_calc_velocity(){
 
 }
 
-/**************************************************************************
- * median filter for testing - increases cycle time
- */
 
-
-#ifdef MEDFILTER
-int16_t medianFilter(int16_t data[3])
-{
-
-	int16_t sortTab[3];
-	uint8_t rdy = 0, sortidx = 0, maxsortidx = 2;
-	int16_t tmp;
-
-
-	//copy to sorting array
-	for(sortidx=0;sortidx<3;sortidx++)
-	{
-		sortTab[sortidx] = data[sortidx];
-	}
-
-	//optimised bubble sort
-	while(rdy == 0){
-		rdy = 1;
-		for (sortidx = 0; sortidx<maxsortidx;sortidx++){
-			tmp = sortTab[sortidx];
-			if (tmp > sortTab[sortidx+1]) {sortTab[sortidx] = sortTab[sortidx+1]; sortTab[sortidx+1] = tmp; rdy = 0;}//check and swap
-		}
-		maxsortidx --;
-	}
-
-	return sortTab[1];
-}
-
-#endif
 
 
 
