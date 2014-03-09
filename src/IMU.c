@@ -754,9 +754,11 @@ uint8_t getEstimatedAltitude(){
 
   EstAlt = (EstAlt * 6 + BaroAlt * 2) >> 3; // additional LPF to reduce baro noise (faster by 30 µs)
 
+#ifdef MEDFILTER
 #ifdef SONAR
   //filter sonar output and compensate for tilt
   debug[3] = applyMedFilter(&SonarFilter,sonarAlt) * halfvz * 2;
+#endif
 #endif
 
   #if (defined(VARIOMETER) && (VARIOMETER != 2)) || !defined(SUPPRESS_BARO_ALTHOLD)
