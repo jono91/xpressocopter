@@ -47,7 +47,6 @@ void GPS_set_pids();
 void GPS_calc_longitude_scaling(int32_t lat);
 void GPS_set_next_wp(int32_t* lat, int32_t* lon);
 void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_t* lon2,uint32_t* dist, int32_t* bearing);
-int16_t medianFilter(int16_t data[]);
 int32_t wrap_18000(int32_t ang);
 int32_t wrap_36000(int32_t ang);
 #endif /* GPS_H_ */

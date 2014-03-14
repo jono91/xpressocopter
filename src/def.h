@@ -44,6 +44,7 @@
 #define BOXLEDMAX    11 // we want maximum illumination
 #define BOXLLIGHTS   12 // enable landing lights at any altitude
 #define BOXHEADADJ   13 // acquire heading for HEADFREE mode
+#define BOXFLOWHOLD  14
 
 #define Yaxis 0
 #define Xaxis 1
@@ -51,7 +52,7 @@
 
 
 #define PIDITEMS 10
-#define CHECKBOXITEMS 14
+#define CHECKBOXITEMS 15
 
 // LPCXpresso eval board LED
 #define LED_PORT 0		// Port for led
@@ -110,6 +111,7 @@ struct flags_struct {
   uint8_t GPS_FIX_HOME :1 ;
   uint8_t SMALL_ANGLES_25 :1 ;
   uint8_t CALIBRATE_MAG :1 ;
+  uint8_t FLOW_HOLD_MODE :1;
 };
 
 #define min(a,b) ((a)<(b)?(a):(b))

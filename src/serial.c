@@ -72,6 +72,7 @@ static const char boxnames[] = // names for dynamic generation of config GUI
   "LEDMAX;"
   "LLIGHTS;"
   "HEADADJ;"
+  "OPTIC FLOW;"
 ;
 
 static const char pidnames[] =

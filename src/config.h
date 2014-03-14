@@ -494,7 +494,7 @@
        You have to use at least I2CGpsNav code r33 */
     //#define I2C_NAV
 	//use I2C GPS by EOSBandi without external navigation
-	#define I2C_GPS
+	//#define I2C_GPS
 
     /* I2C GPS device made with an indeedent ATTiny[24]313 + GPS device and
        optional sonar device.    https://github.com/wertarbyte/tiny-gps/ */
@@ -531,8 +531,10 @@
     #define GPS_LOW_SPEED_D_FILTER               // below .5m/s speed ignore D term for POSHOLD_RATE, theoretically this also removed D term induced noise commnent out to disable
     #define GPS_WP_RADIUS              200       // if we are within this distance to a waypoint then we consider it reached (distance is in cm)
     #define NAV_SLEW_RATE              30        // Adds a rate control to nav output, will smoothen out nav angle spikes
-
-
+  /********************************************************************/
+  /****                       OPTICAL FLOW                         ****/
+  /********************************************************************/
+    #define FLOW                                //enable optical flow sensor for indoor navigation
 
   /********************************************************************/
   /****                             Buzzer                         ****/

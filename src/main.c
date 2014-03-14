@@ -195,122 +195,135 @@ volatile struct conf_def conf;
 	#define NAV_MODE_WP            2
 	volatile uint8_t nav_mode = NAV_MODE_NONE;            //Navigation mode
 
+#ifdef FLOW
+    volatile uint16_t frame_count;// counts created I2C frames
+    volatile int16_t flow_comp_m_x;// x velocity*1000 in meters / timestep
+    volatile int16_t flow_comp_m_y;// y velocity*1000 in meters / timestep
+    volatile int16_t qual;// Optical flow quality / confidence 0: bad, 255: maximum quality
+    volatile uint8_t sonar_timestamp;// timestep in milliseconds between I2C frames
+    volatile int16_t ground_distance;// Ground distance in meters*1000. Positive value: distance known. Negative value: Unknown distance
+#endif
+
+
+
 #if BARO
-  volatile int32_t baroPressure;
-  volatile int32_t baroTemperature;
-  volatile int32_t baroPressureSum;
+    volatile int32_t baroPressure;
+    volatile int32_t baroTemperature;
+    volatile int32_t baroPressureSum;
 #endif
 
 
 void setup() {
-  #if !defined(GPS_PROMINI)
-	UARTInit(115200);
-  #endif
-  LEDPIN_PINMODE;
-  SHIELDLED_PINMODE;
-  //POWERPIN_PINMODE;
-  //BUZZERPIN_PINMODE;
-  //STABLEPIN_PINMODE;
-  //POWERPIN_OFF;
-  /* Initialize GPIO (sets up clock) */
-  	GPIOInit();
-  	init_microsec();
-	enable_microsec();
-	init_timer16PWM();
-	enable_PWMtimer();
+#if !defined(GPS_PROMINI)
+    UARTInit(115200);
+#endif
+    LEDPIN_PINMODE;
+    SHIELDLED_PINMODE;
+    //POWERPIN_PINMODE;
+    //BUZZERPIN_PINMODE;
+    //STABLEPIN_PINMODE;
+    //POWERPIN_OFF;
 
-	/********  special version of MultiWii to calibrate all attached ESCs ************/
-	#if defined(ESC_CALIB_CANNOT_FLY)
-	writeAllMotors(ESC_CALIB_HIGH);
-	delayMs(3000);
-	writeAllMotors(ESC_CALIB_LOW);
-	delayMs(500);
-	while (1) {
-	  delayMs(5000);
-	  blinkLED(2,20, 2);
-	}
-	 // statement never reached
-	#endif
 
-	writeAllMotors(MINCOMMAND);
-	delayMs(300);
+    /* Initialize GPIO (sets up clock) */
+    GPIOInit();
+    init_microsec();
+    enable_microsec();
+    init_timer16PWM();
+    enable_PWMtimer();
 
-  readEEPROM();
-  checkFirstTime();
-  configureReceiver();
-  #if defined(OPENLRSv2MULTI)
+    /********  special version of MultiWii to calibrate all attached ESCs ************/
+#if defined(ESC_CALIB_CANNOT_FLY)
+    writeAllMotors(ESC_CALIB_HIGH);
+    delayMs(3000);
+    writeAllMotors(ESC_CALIB_LOW);
+    delayMs(500);
+    while (1) {
+        delayMs(5000);
+        blinkLED(2,20, 2);
+    }
+    // statement never reached
+#endif
+
+    writeAllMotors(MINCOMMAND);
+    delayMs(300);
+
+    readEEPROM();
+    checkFirstTime();
+    configureReceiver();
+#if defined(OPENLRSv2MULTI)
     initOpenLRS();
-  #endif
-  initSensors();
-  #if defined(I2C_GPS) || defined(GPS_SERIAL) || defined(GPS_FROM_OSD)||defined(I2C_NAV)
+#endif
+    initSensors();
+#if defined(I2C_GPS) || defined(GPS_SERIAL) || defined(GPS_FROM_OSD)||defined(I2C_NAV)
     GPS_set_pids();
-  #endif
-  previousTime = micros();
-  #if defined(GIMBAL)
-   calibratingA = 400;
-  #endif
-  calibratingG = 400;
-  calibratingB = 200;  // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
-  #if defined(POWERMETER)
+#endif
+    previousTime = micros();
+#if defined(GIMBAL)
+    calibratingA = 400;
+#endif
+    calibratingG = 400;
+    calibratingB = 200;  // 10 seconds init_delay + 200 * 25 ms = 15 seconds before ground pressure settles
+#if defined(POWERMETER)
     for(uint8_t i=0;i<=PMOTOR_SUM;i++)
-      pMeter[i]=0;
-  #endif
-  #if defined(ARMEDTIMEWARNING)
+        pMeter[i]=0;
+#endif
+#if defined(ARMEDTIMEWARNING)
     ArmedTimeWarningMicroSeconds = (ARMEDTIMEWARNING *1000000);
-  #endif
-  /************************************/
-  #if defined(GPS_SERIAL)
+#endif
+    /************************************/
+#if defined(GPS_SERIAL)
     SerialOpen(GPS_SERIAL,GPS_BAUD);
     delay(400);
     for(uint8_t i=0;i<=5;i++){
-      GPS_NewData();
-      LEDPIN_ON
-      delay(20);
-      LEDPIN_OFF
-      delay(80);
+        GPS_NewData();
+        LEDPIN_ON
+        delay(20);
+        LEDPIN_OFF
+        delay(80);
     }
     if(!GPS_Present){
-      SerialEnd(GPS_SERIAL);
-      SerialOpen(0,SERIAL_COM_SPEED);
+        SerialEnd(GPS_SERIAL);
+        SerialOpen(0,SERIAL_COM_SPEED);
     }
-    #if !defined(GPS_PROMINI)
-      GPS_Present = 1;
-    #endif
+#if !defined(GPS_PROMINI)
+    GPS_Present = 1;
+#endif
     GPS_Enable = GPS_Present;
-  #endif
-  /************************************/
+#endif
+    /************************************/
 
-  #if defined(I2C_GPS) || defined(TINY_GPS) || defined(GPS_FROM_OSD)|| defined(I2C_NAV)
-   GPS_Enable = 1;
-  #endif
+#if defined(I2C_GPS) || defined(TINY_GPS) || defined(GPS_FROM_OSD)|| defined(I2C_NAV)
+    GPS_Enable = 1;
+#endif
 
-  #if defined(LCD_ETPP) || defined(LCD_LCD03) || defined(OLED_I2C_128x64)
+#if defined(LCD_ETPP) || defined(LCD_LCD03) || defined(OLED_I2C_128x64)
     initLCD();
-  #endif
-  #ifdef LCD_TELEMETRY_DEBUG
+#endif
+#ifdef LCD_TELEMETRY_DEBUG
     telemetry_auto = 1;
-  #endif
-  #ifdef LCD_CONF_DEBUG
+#endif
+#ifdef LCD_CONF_DEBUG
     configurationLoop();
-  #endif
-  #ifdef LANDING_LIGHTS_DDR
+#endif
+#ifdef LANDING_LIGHTS_DDR
     init_landing_lights();
-  #endif
+#endif
 
-  #if defined(LED_FLASHER)
+#if defined(LED_FLASHER)
     init_led_flasher();
     led_flasher_set_sequence(LED_FLASHER_SEQUENCE);
-  #endif
-  f.SMALL_ANGLES_25=1; // important for gyro only conf
+#endif
+    f.SMALL_ANGLES_25=1; // important for gyro only conf
 
-  //initialise median filter structures
+    //initialise median filter structures
 #ifdef MEDFILTER
 #ifdef SONAR
-  initMedianFilter(&SonarFilter, 5);
+    initMedianFilter(&SonarFilter, 5);
 #endif
 #endif
 
-  initWatchDog();
+    initWatchDog();
 }
 
 
@@ -645,7 +658,19 @@ int main (void)
 		      }
 		      #endif
 		    #endif
+#ifdef FLOW
+		    if(rcOptions[BOXFLOWHOLD])
+		    {
+		        f.FLOW_HOLD_MODE = 1;
+		        debug[0] = 1;
+		    }
+		    else
+		    {
+		        f.FLOW_HOLD_MODE = 0;
+		        debug[0] = 0;
+		    }
 
+#endif
 		    if (rcOptions[BOXPASSTHRU]) {f.PASSTHRU_MODE = 1;}
 		    else {f.PASSTHRU_MODE = 0;}
 
@@ -694,6 +719,8 @@ int main (void)
 				  break;
 			  }
 		  }
+		  getFlowData();
+		  debug[0] = frame_count;
 
 		  computeIMU();
 		  // Measure loop rate just afer reading the sensors
@@ -704,7 +731,7 @@ int main (void)
 
 		  //delayMs(500);
 		  //reset watchdog timer
-		  if(millis()>3000)//wait 3s before watchdog starts
+		  if(millis()>10000)//wait 3s before watchdog starts
 			  feedWatchDog();
 
 		  //if(cycleTime > 3150)

@@ -53,6 +53,15 @@ extern int32_t baroPressureSum;
 extern int16_t gyroAHRS[3];
 #endif
 
+#ifdef FLOW
+    extern uint16_t frame_count;// counts created I2C frames
+    extern int16_t flow_comp_m_x;// x velocity*1000 in meters / timestep
+    extern int16_t flow_comp_m_y;// y velocity*1000 in meters / timestep
+    extern int16_t qual;// Optical flow quality / confidence 0: bad, 255: maximum quality
+    extern uint8_t sonar_timestamp;// timestep in milliseconds between I2C frames
+    extern int16_t ground_distance;// Ground distance in meters*1000. Positive value: distance known. Negative value: Unknown distance
+#endif
+
 float magCal[3] = {1.0,1.0,1.0};  // gain for each axis, populated at sensor init
 uint8_t magInit = 0;
 
@@ -658,8 +667,21 @@ void Sonar_update(void)
 #endif
 
 
+// *****************************
+// PX4 FLOW optical flow sensor
+// *****************************
+#ifdef FLOW
+void getFlowData(void)
+{
+    if(i2c_read(FLOW_ADDRESS,0x00,11) == I2CSTATE_ACK)
+    {
+        frame_count = (I2CSlaveBuffer[1]<<8) | (I2CSlaveBuffer[0]);
+    }
+    else
+        i2c_errors_count++;
+}
 
-
+#endif
 // ****************
 // GYRO common part
 // ****************
@@ -881,6 +903,9 @@ void GYRO_Common(void) {
 			initError();				/* Fatal error */
 		}
 		delayMs(100);
+#ifdef FLOW
+		getFlowData(); //read from PX4Flow first so it does not ack packets destined for other sensors
+#endif
 		if (GYRO) Gyro_init();
 		if (BARO) Baro_init();
 		if (MAG) Mag_init();

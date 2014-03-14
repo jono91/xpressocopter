@@ -45,6 +45,7 @@
 	#define MAG_DATA_REGISTER 0x03
 #endif
 
+#define FLOW_ADDRESS 0x42
 
 
 //MPU6050 Gyro LPF setting
@@ -117,6 +118,7 @@ uint8_t Baro_update();
 	void i2c_MS561101BA_Calculate();
 #endif
 void Sonar_update(void);
+void getFlowData(void);
 void GYRO_Common(void);
 void ACC_Common(void);
 uint8_t Mag_getADC(void);
