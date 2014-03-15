@@ -314,7 +314,7 @@ void evaluateCommand(void) {
      headSerialReply(16);
      for( i=0;i<8;i++) serialize16(rcData[i]);
      break;
-#if GPS
+#if GPS || defined(FLOW)
    case MSP_RAW_GPS:
      headSerialReply(14);
      serialize8(f.GPS_FIX);

@@ -24,7 +24,7 @@
 #define PIDcontroller 2 //modified based on alexK's implementation
 
 /******************median filter altitude********************************************************/
-#define MEDFILTER
+//#define MEDFILTER
 
 
 /*************************************************************************************************/
@@ -162,7 +162,7 @@
       //#define SRF10
       //#define SRF23
 		//#define MAXSONAR
-		#define MAXSONAR_PWM
+		//#define MAXSONAR_PWM
 
       /* ADC accelerometer */ // for 5DOF from sparkfun, uses analog PIN A1/A2/A3
       //#define ADCACC
