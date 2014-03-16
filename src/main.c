@@ -26,7 +26,7 @@
 #include "IMU.h"
 #include "common.h"
 #include "math.h"
-#ifdef GPS
+#if GPS
 	#include "GPS.h"
 #endif
 #ifdef MEDFILTER
@@ -664,7 +664,14 @@ int main (void)
 #ifdef FLOW
             if(rcOptions[BOXFLOWHOLD])
             {
-                f.FLOW_HOLD_MODE = 1;
+                if (!f.FLOW_HOLD_MODE)
+                {
+                    f.FLOW_HOLD_MODE = 1;
+                    GPS_hold[LAT] = GPS_coord[LAT];
+                    GPS_hold[LON] = GPS_coord[LON];
+                    flow_set_next_wp(&GPS_hold[LAT],&GPS_hold[LON]);
+                    nav_mode = NAV_MODE_POSHOLD;
+                }
                 //debug[1] = 1;
             }
             else
@@ -780,7 +787,28 @@ int main (void)
         //debug[3] = GPS_angle[PITCH];
 #endif
 
+#ifdef FLOW
+        if (!f.FLOW_HOLD_MODE) {
+            flow_reset_nav(); // If GPS is not activated. Reset nav loops and all nav related parameters
+            GPS_angle[ROLL]   = 0;
+            GPS_angle[PITCH]  = 0;
+        } else {
+            float sin_yaw_y = sinf(heading*0.0174532925f);
+            float cos_yaw_x = cosf(heading*0.0174532925f);
 
+#if defined(NAV_SLEW_RATE)
+            nav_rated[LON] += constrain(wrap_18000(nav[LON]-nav_rated[LON]),-NAV_SLEW_RATE,NAV_SLEW_RATE);
+            nav_rated[LAT] += constrain(wrap_18000(nav[LAT]-nav_rated[LAT]),-NAV_SLEW_RATE,NAV_SLEW_RATE);
+            GPS_angle[ROLL]   = (nav_rated[LON]*cos_yaw_x - nav_rated[LAT]*sin_yaw_y) /10;
+            GPS_angle[PITCH]  = (nav_rated[LON]*sin_yaw_y + nav_rated[LAT]*cos_yaw_x) /10;
+#else
+            GPS_angle[ROLL]   = (nav[LON]*cos_yaw_x - nav[LAT]*sin_yaw_y) /10;
+            GPS_angle[PITCH]  = (nav[LON]*sin_yaw_y + nav[LAT]*cos_yaw_x) /10;
+#endif
+        }
+        //debug[2] = GPS_angle[ROLL];
+        //debug[3] = GPS_angle[PITCH];
+#endif
 
 
 #if PIDcontroller == 1
