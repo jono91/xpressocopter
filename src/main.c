@@ -719,7 +719,7 @@ int main (void)
 #if !defined(MAXSONAR_PWM) && !defined(FLOW)
                 Sonar_update();
 #endif
-                debug[2] = sonarAlt;
+                //debug[2] = sonarAlt;
 #endif
 #ifdef LANDING_LIGHTS_DDR
                 auto_switch_landing_lights();
