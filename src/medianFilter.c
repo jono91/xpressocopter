@@ -29,7 +29,7 @@ void initMedianFilter(filterHistory_t *history, uint8_t historyLength)
 
 }
 
-int16_t applyMedFilter(filterHistory_t *history, uint16_t newValue)
+int16_t applyMedFilter(filterHistory_t *history, int16_t newValue)
 {
 
     int16_t sortTab[7];

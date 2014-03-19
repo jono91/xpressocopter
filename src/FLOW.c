@@ -12,6 +12,7 @@
 #include "def.h"
 #include "i2c.h"
 #include "sensors.h"
+#include "medianFilter.h"
 
 #ifdef FLOW
 
@@ -34,6 +35,10 @@ extern int16_t heading, magHold;
 extern int16_t debug[4];
 extern int16_t sonarAlt;
 
+#ifdef MEDFILTER
+extern filterHistory_t FlowFiltLon;
+extern filterHistory_t FlowFiltLat;
+#endif
 float sinHeading, cosHeading;
 
 // ************************
@@ -211,10 +216,10 @@ uint8_t flowUpdate(void)
             return 0; //return and do nothing with data as missing information will induced errors in integration
         }
     }
-    debug[0] = missedFrames;
-    debug[1] = sonar_timestamp;
-    debug[2] = actual_speed[LON];
-    debug[3] = actual_speed[LAT];
+    //debug[0] = missedFrames;
+    //debug[1] = sonar_timestamp;
+    debug[0] = (int16_t)GPS_coord[LON];
+    debug[1] = (int16_t)GPS_coord[LAT];
 
     //update trig functions
     sinHeading = sinf(heading*0.0174532925f);
@@ -321,8 +326,17 @@ static void flow_calc_velocity(void)
  */
 static void flow_calc_pos(void)
 {
+#ifdef MEDFILTER
+	int16_t velSmooth[2];
+	velSmooth[LON] = applyMedFilter(&FlowFiltLon, (int16_t)globalFlowVel[LON]);
+	velSmooth[LAT] = applyMedFilter(&FlowFiltLat, (int16_t)globalFlowVel[LAT]);
+
+	GPS_coord[LON] += velSmooth[LON] * dTnav;//millimeters
+	GPS_coord[LAT] += velSmooth[LAT] * dTnav;
+#else
     GPS_coord[LON] += globalFlowVel[LON] * dTnav;//millimeters
     GPS_coord[LAT] += globalFlowVel[LAT] * dTnav;
+#endif
 
     GPS_distanceToHome = sqrt(GPS_coord[LON]*GPS_coord[LON] + GPS_coord[LAT]*GPS_coord[LAT])/1000;
 

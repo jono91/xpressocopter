@@ -78,6 +78,10 @@ volatile int16_t  sonarAlt; //to think about the unit
 #ifdef SONAR
 volatile filterHistory_t SonarFilter;
 #endif
+#ifdef FLOW
+volatile filterHistory_t FlowFiltLon;
+volatile filterHistory_t FlowFiltLat;
+#endif
 #endif
 
 volatile struct flags_struct f;
@@ -323,6 +327,10 @@ void setup() {
 #ifdef MEDFILTER
 #ifdef SONAR
     initMedianFilter(&SonarFilter, 5);
+#endif
+#ifdef FLOW
+    initMedianFilter(&FlowFiltLon, 3);
+    initMedianFilter(&FlowFiltLat, 3);
 #endif
 #endif
 
