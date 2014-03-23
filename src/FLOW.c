@@ -29,6 +29,7 @@ extern int16_t ground_distance;// Ground distance in meters*1000. Positive value
 uint16_t prev_frame_count = 0;//number of i2c frames updated in previous probe
 uint16_t missedFrames = 0;
 float globalFlowVel[2] = {0,0}; //change in position between updates in mm in ENU frame
+float posCoord[2] = {0,0};
 
 extern int16_t gyroData[3];
 extern int16_t heading, magHold;
@@ -163,7 +164,7 @@ static float  dTnav;            // Delta Time in milliseconds for navigation com
 extern uint8_t nav_mode;            //Navigation mode
 
 
-int16_t actual_speed[2] = {0,0};
+float actual_speed[2] = {0,0};
 
 static void flow_calc_velocity(void);
 static void flow_calc_pos(void);
@@ -288,7 +289,7 @@ uint8_t flowUpdate(void)
  */
 static void flow_calc_velocity(void)
 {
-    static int16_t speed_old[2] = {0,0};
+    static float speed_old[2] = {0,0};
     static uint8_t init = 0;
     float GyroRate = gyroData[Zaxis] * GYRO_SCALE_FLOW;
     //compensate for z axis rotation
@@ -326,17 +327,13 @@ static void flow_calc_velocity(void)
  */
 static void flow_calc_pos(void)
 {
-#ifdef MEDFILTER
-	int16_t velSmooth[2];
-	velSmooth[LON] = applyMedFilter(&FlowFiltLon, (int16_t)globalFlowVel[LON]);
-	velSmooth[LAT] = applyMedFilter(&FlowFiltLat, (int16_t)globalFlowVel[LAT]);
 
-	GPS_coord[LON] += velSmooth[LON] * dTnav;//millimeters
-	GPS_coord[LAT] += velSmooth[LAT] * dTnav;
-#else
-    GPS_coord[LON] += globalFlowVel[LON] * dTnav;//millimeters
-    GPS_coord[LAT] += globalFlowVel[LAT] * dTnav;
-#endif
+    posCoord[LON] += globalFlowVel[LON] * dTnav;//millimeters
+    posCoord[LAT] += globalFlowVel[LAT] * dTnav;
+
+
+    GPS_coord[LON] = posCoord[LON];
+    GPS_coord[LAT] = posCoord[LAT];
 
     GPS_distanceToHome = sqrt(GPS_coord[LON]*GPS_coord[LON] + GPS_coord[LAT]*GPS_coord[LAT])/1000;
 

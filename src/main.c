@@ -334,7 +334,7 @@ void setup() {
 #endif
 #endif
 
-    initWatchDog();
+    //initWatchDog();
 }
 
 
