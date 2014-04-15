@@ -36,10 +36,6 @@ extern int16_t heading, magHold;
 extern int16_t debug[4];
 extern int16_t sonarAlt;
 
-#ifdef MEDFILTER
-extern filterHistory_t FlowFiltLon;
-extern filterHistory_t FlowFiltLat;
-#endif
 float sinHeading, cosHeading;
 
 // ************************

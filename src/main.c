@@ -78,10 +78,6 @@ volatile int16_t  sonarAlt; //to think about the unit
 #ifdef SONAR
 volatile filterHistory_t SonarFilter;
 #endif
-#ifdef FLOW
-volatile filterHistory_t FlowFiltLon;
-volatile filterHistory_t FlowFiltLat;
-#endif
 #endif
 
 volatile struct flags_struct f;
@@ -328,10 +324,6 @@ void setup() {
 #ifdef SONAR
     initMedianFilter(&SonarFilter, 5);
 #endif
-#ifdef FLOW
-    initMedianFilter(&FlowFiltLon, 3);
-    initMedianFilter(&FlowFiltLat, 3);
-#endif
 #endif
 
     initWatchDog();
@@ -389,9 +381,11 @@ int main (void)
 
 
 
-        if (currentTime > rcTime ) { // 50Hz
+        if ((currentTime > rcTime) || rcTime > (currentTime + 20000)) { // 50Hz + additional check to ensure rcTime can reach currentTime
             rcTime = currentTime + 20000;
             computeRC();
+            //reset watchdog timer in RC loop to ensure user is not locked out of control
+            feedWatchDog();
             // Failsafe routine - added by MIS
 #if defined(FAILSAFE)
             if ( failsafeCnt > (5*FAILSAVE_DELAY) && f.ARMED) {                  // Stabilize, and set Throttle to specified level
@@ -748,9 +742,7 @@ int main (void)
 
 
         //delayMs(500);
-        //reset watchdog timer
-        if(millis()>3000)//wait 3s before watchdog starts
-            feedWatchDog();
+
 
         //if(cycleTime > 3150)
         //  debug[0]++;
